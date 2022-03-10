@@ -10,7 +10,6 @@ import hello.proxy.config.v1_proxy.interface_proxy.OrderControllerInterfaceProxy
 import hello.proxy.config.v1_proxy.interface_proxy.OrderRepositoryInterfaceProxy;
 import hello.proxy.config.v1_proxy.interface_proxy.OrderServiceInterfaceseProxy;
 import hello.proxy.trace.logtrace.LogTrace;
-import hello.proxy.trace.logtrace.ThreadLocalLogTrace;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,43 +17,20 @@ import org.springframework.context.annotation.Configuration;
 public class InterfaceProxyConfig {
 
     @Bean
-    public LogTrace logTrace() {
-        return new ThreadLocalLogTrace();
+    public OrderControllerV1 orderController(LogTrace logTrace) {
+        OrderControllerV1Impl controllerImpl = new OrderControllerV1Impl(orderService(logTrace));
+        return new OrderControllerInterfaceProxy(controllerImpl, logTrace);
     }
 
     @Bean
-    public OrderControllerV1 orderController() {
-        OrderControllerV1Impl controllerImpl = new OrderControllerV1Impl(orderService());
-        return new OrderControllerInterfaceProxy(controllerImpl, logTrace());
+    public OrderServiceV1 orderService(LogTrace logTrace) {
+        OrderServiceV1Impl serviceImpl = new OrderServiceV1Impl(orderRepository(logTrace));
+        return new OrderServiceInterfaceseProxy(serviceImpl, logTrace);
     }
 
     @Bean
-    public OrderServiceV1 orderService() {
-        OrderServiceV1Impl serviceImpl = new OrderServiceV1Impl(orderRepository());
-        return new OrderServiceInterfaceseProxy(serviceImpl, logTrace());
-    }
-
-    @Bean
-    public OrderRepositoryV1 orderRepository() {
+    public OrderRepositoryV1 orderRepository(LogTrace logTrace) {
         OrderRepositoryV1Impl repositoryImpl = new OrderRepositoryV1Impl();
-        return new OrderRepositoryInterfaceProxy(repositoryImpl, logTrace());
+        return new OrderRepositoryInterfaceProxy(repositoryImpl, logTrace);
     }
-
-//    @Bean
-//    public OrderControllerV1 orderController(LogTrace logTrace) {
-//        OrderControllerV1Impl controllerImpl = new OrderControllerV1Impl(orderService(logTrace));
-//        return new OrderControllerInterfaceProxy(controllerImpl, logTrace);
-//    }
-//
-//    @Bean
-//    public OrderServiceV1 orderService(LogTrace logTrace) {
-//        OrderServiceV1Impl serviceImpl = new OrderServiceV1Impl(orderRepository(logTrace));
-//        return new OrderServiceInterfaceseProxy(serviceImpl, logTrace);
-//    }
-//
-//    @Bean
-//    public OrderRepositoryV1 orderRepository(LogTrace logTrace) {
-//        OrderRepositoryV1Impl repositoryImpl = new OrderRepositoryV1Impl();
-//        return new OrderRepositoryInterfaceProxy(repositoryImpl, logTrace);
-//    }
 }
